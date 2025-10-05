@@ -11,7 +11,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 echo "Pulling latest code from GitHub..."
-                git branch: 'main', url: 'https://github.com/syedtalhahamid/profile-app.git'
+                git branch: 'master', url: 'https://github.com/syedtalhahamid/profile-app.git'
             }
         }
 
