@@ -10,7 +10,7 @@ app.secret_key = os.urandom(24)
 # DATABASE CONNECTION
 # -----------------------------
 db = mysql.connector.connect(
-    host="localhost",
+    host="myapp-db.cq7quaee28jc.us-east-1.rds.amazonaws.com",
     user="root",
     password="root"
 )
