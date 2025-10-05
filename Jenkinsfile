@@ -23,7 +23,7 @@ pipeline {
                     sh "docker rm -f profile-app-container || true"
 
                     // Run container
-                    sh "docker run -d --name profile-app-container -p 8081:8080 profile-app:latest"
+                    sh "docker run -d --name profile-app-container -p 5000:5000 profile-app:latest"
                 }
             }
         }
