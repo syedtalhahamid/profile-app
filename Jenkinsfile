@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         EC2_USER = 'ubuntu'
-        EC2_HOST = '18.215.165.166'  // replace with your EC2 public IP or use parameter
-        SSH_KEY = '/home/jenkins/.ssh/mynewkey1.pem'  // Jenkins server key path
+        EC2_HOST = '18.215.165.166'
+        SSH_KEY = '/var/lib/jenkins/.ssh/mynewkey1.pem'
         APP_NAME = 'profile-app'
     }
 
@@ -24,38 +24,24 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image (Optional)') {
-            steps {
-                script {
-                    // Uncomment if pushing to Docker Hub
-                    // docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                    //     docker.image("${APP_NAME}:latest").push()
-                    // }
-                }
-            }
-        }
-
         stage('Deploy on EC2') {
             steps {
-                script {
-                    // Copy docker-compose.yml and updated code to EC2
-                    sh """
-                    scp -i ${SSH_KEY} docker-compose.yml ${EC2_USER}@${EC2_HOST}:/home/${EC2_USER}/docker-compose.yml
-                    scp -i ${SSH_KEY} -r * ${EC2_USER}@${EC2_HOST}:/home/${EC2_USER}/app/
-                    """
+                // Copy docker-compose.yml and app code to EC2
+                sh """
+                scp -i ${SSH_KEY} docker-compose.yml ${EC2_USER}@${EC2_HOST}:/home/${EC2_USER}/docker-compose.yml
+                scp -i ${SSH_KEY} -r * ${EC2_USER}@${EC2_HOST}:/home/${EC2_USER}/app/
+                """
 
-                    // SSH to EC2 and run Docker Compose
-                    sh """
-                    ssh -i ${SSH_KEY} ${EC2_USER}@${EC2_HOST} '
-                        cd /home/${EC2_USER}/
-                        docker compose down
-                        docker compose up -d --build
-                    '
-                    """
-                }
+                // SSH to EC2 and run Docker Compose
+                sh """
+                ssh -i ${SSH_KEY} ${EC2_USER}@${EC2_HOST} '
+                    cd /home/${EC2_USER}/
+                    docker compose down
+                    docker compose up -d --build
+                '
+                """
             }
         }
-
     }
 
     post {
