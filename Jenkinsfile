@@ -12,7 +12,7 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/syedtalhahamid/profile-app.git'
+                git branch: 'master', url: 'https://github.com/syedtalhahamid/profile-app.git'
             }
         }
 
