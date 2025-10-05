@@ -41,7 +41,7 @@ db = mysql.connector.connect(
    host="myapp-db.cq7quaee28jc.us-east-1.rds.amazonaws.com",  # RDS endpoint
     user="admin",                                               # RDS username
     password="StrongPassword123",                             # RDS password
-    port=3306   
+    port=3306,   
     database="codenera"
 )
 cursor = db.cursor(dictionary=True)
