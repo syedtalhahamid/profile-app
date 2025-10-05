@@ -38,9 +38,10 @@ cursor.close()
 
 # Reconnect with dictionary cursor
 db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="root",
+   host="myapp-db.cq7quaee28jc.us-east-1.rds.amazonaws.com",  # RDS endpoint
+    user="admin",                                               # RDS username
+    password="StrongPassword123",                             # RDS password
+    port=3306   
     database="codenera"
 )
 cursor = db.cursor(dictionary=True)
