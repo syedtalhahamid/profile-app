@@ -1,13 +1,7 @@
 pipeline {
     agent any
-
-    environment {
-        IMAGE_NAME = "profile-app:latest"
-        CONTAINER_NAME = "profile-app-container"
-    }
-
+    
     stages {
-
         stage('Checkout Code') {
             steps {
                 git url: 'https://github.com/syedtalhahamid/profile-app.git', branch: 'master'
@@ -16,32 +10,31 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
+                script {
+                    sh "docker build -t profile-app:latest ."
+                }
             }
         }
 
         stage('Run Docker Container') {
             steps {
-                // Stop and remove previous container if exists
-                sh '''
-                if [ $(docker ps -aq -f name=$CONTAINER_NAME) ]; then
-                    docker stop $CONTAINER_NAME
-                    docker rm $CONTAINER_NAME
-                fi
-                '''
+                script {
+                    // Stop and remove container if already running
+                    sh "docker rm -f profile-app-container || true"
 
-                // Run new container
-                sh 'docker run -d --name $CONTAINER_NAME -p 5000:5000 $IMAGE_NAME'
+                    // Run container
+                    sh "docker run -d --name profile-app-container -p 8081:8080 profile-app:latest"
+                }
             }
         }
     }
 
     post {
         success {
-            echo 'App deployed successfully!'
+            echo "Deployment completed successfully!"
         }
         failure {
-            echo 'Deployment failed!'
+            echo "Deployment failed!"
         }
     }
 }
