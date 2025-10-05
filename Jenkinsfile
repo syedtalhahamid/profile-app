@@ -1,39 +1,38 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "profile-app"
+        CONTAINER_NAME = "profile-app-container"
+        PORT = "5000"
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
-                git url: 'https://github.com/syedtalhahamid/profile-app.git', branch: 'master'
+                echo "Pulling latest code from GitHub..."
+                git branch: 'main', url: 'https://github.com/syedtalhahamid/profile-app.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
+                echo "Building Docker image..."
                 script {
-                    echo "Building new Docker image..."
-                    sh '''
-                        # Stop and remove old container if exists
-                        docker rm -f profile-app-container || true
-                        
-                        # Remove old image if exists
-                        docker rmi -f profile-app:latest || true
-                        
-                        # Build new image
-                        docker build -t profile-app:latest .
-                    '''
+                    sh 'docker build -t ${IMAGE_NAME}:latest .'
                 }
             }
         }
 
         stage('Run Docker Container') {
             steps {
+                echo "Running Docker container..."
                 script {
-                    echo "Running new container..."
-                    sh '''
-                        # Run new container on port 80 -> 5000
-                        docker run -d --name profile-app-container -p 80:5000 profile-app:latest
-                    '''
+                    // Stop and remove if already running
+                    sh 'docker ps -a -q --filter "name=${CONTAINER_NAME}" | grep -q . && docker rm -f ${CONTAINER_NAME} || true'
+
+                    // Run new container
+                    sh 'docker run -d --name ${CONTAINER_NAME} -p ${PORT}:5000 ${IMAGE_NAME}:latest'
                 }
             }
         }
@@ -41,11 +40,12 @@ pipeline {
 
     post {
         success {
-            echo " Deployment completed successfully!"
-            echo "Access the app at: http://<EC2-PUBLIC-IP>/register"
+            echo "✅ Deployment completed successfully!"
+            sh 'docker images'
+            sh 'docker ps'
         }
         failure {
-            echo " Deployment failed!"
+            echo "❌ Deployment failed. Please check logs."
         }
     }
 }
