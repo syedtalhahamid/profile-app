@@ -26,4 +26,22 @@ pipeline {
                 sh '''
                 if [ $(docker ps -aq -f name=$CONTAINER_NAME) ]; then
                     docker stop $CONTAINER_NAME
-                    do
+                    docker rm $CONTAINER_NAME
+                fi
+                '''
+
+                // Run new container
+                sh 'docker run -d --name $CONTAINER_NAME -p 5000:5000 $IMAGE_NAME'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'App deployed successfully!'
+        }
+        failure {
+            echo 'Deployment failed!'
+        }
+    }
+}
