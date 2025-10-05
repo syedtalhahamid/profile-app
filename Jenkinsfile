@@ -3,14 +3,15 @@ pipeline {
 
     environment {
         EC2_USER = 'ubuntu'
-        EC2_HOST = '18.215.165.166'
-        SSH_KEY = '/var/lib/jenkins/.ssh/mynewkey1.pem'
+        EC2_HOST = '18.215.165.166'       // replace with your EC2 public IP
+        SSH_KEY = '/var/lib/jenkins/.ssh/mynewkey1.pem'  // path to private key on Jenkins
         APP_NAME = 'profile-app'
+        APP_DIR = '/home/ubuntu/app'
     }
 
     stages {
 
-        stage('Clone Repository') {
+        stage('Checkout Code') {
             steps {
                 git branch: 'master', url: 'https://github.com/syedtalhahamid/profile-app.git'
             }
@@ -19,23 +20,23 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh """
-                        docker build -t ${APP_NAME}:latest .
-                    """
+                docker build -t ${APP_NAME}:latest .
+                """
             }
         }
 
         stage('Deploy on EC2') {
             steps {
-                // Copy docker-compose.yml and app code to EC2
+                // Copy app code and docker-compose.yml to EC2
                 sh """
-                scp -i ${SSH_KEY} docker-compose.yml ${EC2_USER}@${EC2_HOST}:/home/${EC2_USER}/docker-compose.yml
-                scp -i ${SSH_KEY} -r * ${EC2_USER}@${EC2_HOST}:/home/${EC2_USER}/app/
+                scp -i ${SSH_KEY} -r * ${EC2_USER}@${EC2_HOST}:${APP_DIR}/
+                scp -i ${SSH_KEY} docker-compose.yml ${EC2_USER}@${EC2_HOST}:${APP_DIR}/docker-compose.yml
                 """
 
-                // SSH to EC2 and run Docker Compose
+                // SSH into EC2 and run Docker Compose
                 sh """
                 ssh -i ${SSH_KEY} ${EC2_USER}@${EC2_HOST} '
-                    cd /home/${EC2_USER}/
+                    cd ${APP_DIR}
                     docker compose down
                     docker compose up -d --build
                 '
