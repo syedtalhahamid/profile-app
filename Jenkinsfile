@@ -1,12 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        IMAGE_NAME = "profile-app"
-        CONTAINER_NAME = "profile-app-container"
-        PORT = 5000
-    }
-
     stages {
         stage('Checkout Code') {
             steps {
@@ -19,7 +13,7 @@ pipeline {
             steps {
                 echo "Building Docker image..."
                 script {
-                    sh 'docker build -t ${IMAGE_NAME}:latest .'
+                    sh 'docker build -t profile-app:latest .'
                 }
             }
         }
@@ -29,10 +23,10 @@ pipeline {
                 echo "Running Docker container..."
                 script {
                     // Stop and remove if already running
-                    sh 'docker ps -a -q --filter "name=${CONTAINER_NAME}" | grep -q . && docker rm -f ${CONTAINER_NAME} || true'
+                    sh 'docker ps -a -q --filter "name=profile-app-container | grep -q . && docker rm -f profile-app-container || true'
 
                     // Run new container
-                    sh 'docker run -d --name ${CONTAINER_NAME} -p ${PORT}:5000 ${IMAGE_NAME}:latest'
+                    sh 'docker run -d --name profile-app-container -p 5000:5000 profile-app:latest'
                 }
             }
         }
