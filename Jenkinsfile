@@ -22,8 +22,12 @@ pipeline {
             steps {
                 echo "Running Docker container..."
                 script {
-                    // Stop and remove if already running
-                    sh 'docker ps -a -q --filter "name=profile-app-container | grep -q . && docker rm -f profile-app-container || true'
+                    // Stop and remove existing container if it exists
+                    sh '''
+                    if [ "$(docker ps -aq -f name=profile-app-container)" ]; then
+                        docker rm -f profile-app-container
+                    fi
+                    '''
 
                     // Run new container
                     sh 'docker run -d --name profile-app-container -p 5000:5000 profile-app:latest'
