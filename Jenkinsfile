@@ -4,7 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = "profile-app"
         CONTAINER_NAME = "profile-app-container"
-        PORT = "5000"
+        PORT = 5000
     }
 
     stages {
