@@ -30,7 +30,7 @@ pipeline {
                     '''
 
                     // Run new container
-                    sh 'docker run -d --name profile-app-container -p 5000:5000 profile-app:latest'
+                    sh 'docker run -d --name profile-app-container -p 5010:5010 profile-app:latest'
                 }
             }
         }
